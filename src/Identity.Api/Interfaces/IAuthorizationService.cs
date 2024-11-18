@@ -9,5 +9,5 @@ public interface IAuthorizationService
     Task<(string, string)> LoginUserAsync    (LoginUserDto user);
     Task<(string, string)> RefreshUserAsync  (string userid, string refreshToken);
     Task<IdentityResult>   RegisterUserAsync (RegisterUserDto user);
-    Task                   UpdateUserAsync   (string userid, UpdateUserDto user);
+    Task<IdentityResult>   UpdateUserAsync   (string userid, UpdateUserDto user);
 }

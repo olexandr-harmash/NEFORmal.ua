@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NEFORmal.ua.Identity.Api.Apis;
 using NEFORmal.ua.Identity.Api.Configs;
 
@@ -8,11 +10,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.ConfigureDatabase      (builder.Configuration);
-builder.Services.ConfigureAuthorization (builder.Configuration);
-builder.Services.ConfigureIdentity      ();
+builder.Services.ConfigureDatabase         (builder.Configuration);
+builder.Services.ConfigureIdentity         ();
+builder.Services.ConfigureIdentityServices (builder.Configuration);
+builder.Services.ConfigureAuthentication   (builder.Configuration);
+builder.Services.AddAuthorization          ();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -22,6 +35,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 IdentityApi.MapRoutes(app);
 

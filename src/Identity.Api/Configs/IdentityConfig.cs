@@ -7,7 +7,7 @@ public static class IdentityConfig
     public static IServiceCollection ConfigureIdentity(this IServiceCollection services)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<IdentityDbContext>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
         services.Configure<IdentityOptions>(options =>
@@ -16,8 +16,7 @@ public static class IdentityConfig
             options.Password.RequireLowercase       = true;
             options.Password.RequireUppercase       = true;
             options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequiredLength         = 8;
-            
+            options.Password.RequiredLength         = 8; 
             options.User.RequireUniqueEmail         = true;
         });
 

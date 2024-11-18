@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace NEFORmal.ua.Identity.Api.Configs;
 
@@ -11,7 +10,7 @@ public static class DatabaseConfig
 
         ArgumentNullException.ThrowIfNullOrEmpty(connectionString);
 
-        services.AddDbContext<IdentityDbContext>(opt => 
+        services.AddDbContext<ApplicationDbContext>(opt => 
             opt.UseNpgsql(connectionString, opt => 
                 opt.MigrationsAssembly("Identity.Api")
             )

@@ -32,7 +32,7 @@ public class JwtTokenService : IJwtTokenService
             new Claim(ClaimTypes.Name,     user.UserName),
             new Claim(ClaimTypes.Sid,      user.Id),
             new Claim(ClaimTypes.Email,    user.Email),
-            new Claim(ClaimTypes.UserData, user.ProfilePhoto)
+            new Claim(ClaimTypes.UserData, user.ProfilePhoto ?? "")
         };
 
         var tokenOptions = new JwtSecurityToken
@@ -45,7 +45,7 @@ public class JwtTokenService : IJwtTokenService
         );
 
         var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-        
+
         return token;
     }
 

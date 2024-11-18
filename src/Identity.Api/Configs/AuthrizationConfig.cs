@@ -7,10 +7,10 @@ namespace NEFORmal.ua.Identity.Api.Configs;
 
 public static class AuthrizationConfig
 {
-    public static IServiceCollection ConfigureAuthorization(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtTokenOptions>();
-        
+
         var secretKey = Environment.GetEnvironmentVariable("SECRET");
 
         ArgumentNullException.ThrowIfNullOrEmpty (secretKey);

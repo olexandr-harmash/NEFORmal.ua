@@ -26,7 +26,6 @@ public class AuthorizationService : IAuthorizationService
 
         if (appuser == null)
         {
-            _logger.LogError($"Error updating user: UserNotFoundException for {userid}");
             throw new UserNotFoundException();
         }
 
@@ -40,7 +39,6 @@ public class AuthorizationService : IAuthorizationService
 
         if (string.IsNullOrEmpty(email) && string.IsNullOrEmpty(login))
         {
-            _logger.LogError($"Error updating user: ArgumentNullException for {user.UserName}");
             throw new ArgumentNullException();
         }
 
@@ -57,7 +55,6 @@ public class AuthorizationService : IAuthorizationService
  
         if (appuser == null)
         {
-            _logger.LogError($"Error updating user: UserNotFoundException for {user.UserName}");
             throw new UserNotFoundException();
         }
 
@@ -65,7 +62,6 @@ public class AuthorizationService : IAuthorizationService
 
         if (!passresult)
         {
-            _logger.LogError($"Error updating user: UserPasswordNotEquivalentException for {user.UserName}");
             throw new UserPasswordNotEquivalentException();
         }
 
@@ -85,13 +81,11 @@ public class AuthorizationService : IAuthorizationService
 
         if (appuser == null)
         {
-            _logger.LogError($"Error updating user: UserNotFoundException for {userid}");
             throw new UserNotFoundException();
         }
 
         if (appuser.RefreshToken != refreshToken)
         {
-            _logger.LogError($"Error updating user: UserRefreshTokenNotEquivalentException for {userid}");
             throw new UserRefreshTokenNotEquivalentException();
         }
 
@@ -111,7 +105,6 @@ public class AuthorizationService : IAuthorizationService
 
         if (appuser != null)
         {
-            _logger.LogError($"Error updating user: UserAlreadyExistsException for {user.UserName}");
             throw new UserAlreadyExistsException();
         }
 
@@ -124,13 +117,12 @@ public class AuthorizationService : IAuthorizationService
         return await _userManager.CreateAsync(newuser, user.Password);
     }
 
-    public async Task UpdateUserAsync(string userid, UpdateUserDto user)
+    public async Task<IdentityResult> UpdateUserAsync(string userid, UpdateUserDto user)
     {
         var appuser = await _userManager.FindByIdAsync(userid);
 
         if (appuser == null)
         {
-            _logger.LogError($"Error updating user: UserNotFoundException for {userid}");
             throw new UserNotFoundException();
         }
 
@@ -140,11 +132,18 @@ public class AuthorizationService : IAuthorizationService
 
             if (!passwordValid)
             {
-                _logger.LogError($"Error updating user: InvalidPasswordException for {userid}");
                 throw new InvalidPasswordException();
             }
 
             appuser.PasswordHash = _userManager.PasswordHasher.HashPassword(appuser, user.Password);
+        }
+
+        string? filePath = null;
+
+        if (user.ProfilePhoto != null)
+        {
+            filePath = await SaveFileAsync(user.ProfilePhoto);
+            appuser.ProfilePhoto = filePath;
         }
 
         if (user.UserName != null)
@@ -152,19 +151,9 @@ public class AuthorizationService : IAuthorizationService
             appuser.UserName = user.UserName;
         }
 
-        string? filePath = null;
+        var result = await _userManager.UpdateAsync(appuser);
 
-        try
-        {
-            if (user.ProfilePhoto != null)
-            {
-                filePath = await SaveFileAsync(user.ProfilePhoto);
-                appuser.ProfilePhoto = filePath;
-            }
-
-            await _userManager.UpdateAsync(appuser);
-        }
-        catch(Exception e)
+        if (!result.Succeeded)
         {
             if (filePath != null)
             {
@@ -177,22 +166,29 @@ public class AuthorizationService : IAuthorizationService
                     _logger.LogError($"Error deleting file: {deleteEx.Message}");
                 }
             }
-
-            _logger.LogError($"Error updating user: {e.Message}");
-            throw;
         }
+
+        return result;
     }
 
     private async Task<string> SaveFileAsync(IFormFile file)
     {   
         var filename = $"{Guid.NewGuid()}_{file.FileName}";
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", filename);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        try
         {
-            await file.CopyToAsync(stream);
-        }
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", filename);
 
-        return filePath;
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return filePath;
+        } 
+        catch
+        {
+            throw new SaveFileException();
+        }
     }
 }

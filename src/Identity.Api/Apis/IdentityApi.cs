@@ -31,7 +31,16 @@ public static class IdentityApi
 
         try
         {   
-            await services.AuthorizationService.UpdateUserAsync(userIdClaim.Value, user);
+            var result = await services.AuthorizationService.UpdateUserAsync(userIdClaim.Value, user);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors
+                    .Select(error => new { Code = error.Code, Description = error.Description })
+                    .ToList();
+
+                return Results.BadRequest(new { Errors = errors });
+            }
 
             return TypedResults.Ok();
         }
@@ -123,7 +132,7 @@ public static class IdentityApi
         {
             return TypedResults.BadRequest();
         }
-        catch(Exception e)
+        catch
         {
             return TypedResults.StatusCode(500);
         }

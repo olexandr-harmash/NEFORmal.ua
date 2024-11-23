@@ -37,10 +37,10 @@ public class DatingDbSeed
                     28,
                     "Female"
                 );
-                
+
             profile2.UpdateProfilePhotos(new List<string> { "photo1.jpg", "photo2.jpg" });
 
-            var profiles = new List<Profile>{ profile1, profile2 };
+            var profiles = new List<Profile> { profile1, profile2 };
 
             _context.Set<Profile>().AddRange(profiles);
             await _context.SaveChangesAsync();

@@ -3,13 +3,14 @@ using System.Linq.Expressions;
 using NEFORmal.ua.Dating.ApplicationCore.Dtos;
 using NEFORmal.ua.Dating.ApplicationCore.Models;
 using NEFORmal.ua.Dating.ApplicationCore.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace NEFORmal.ua.Dating.Infrastructure.Repository;
 
 public class ProfileRepository : BaseRepository<DatingDbContext, Profile>, IProfileRepository
 {
     private new readonly DatingDbContext _context;
-    
+
     public ProfileRepository(DatingDbContext context) : base(context)
     {
         _context = context;
@@ -40,7 +41,7 @@ public class ProfileRepository : BaseRepository<DatingDbContext, Profile>, IProf
     public async Task<IEnumerable<Profile>> GetProfileByFilter(ProfileFilterDto filter, CancellationToken cancellationToken)
     {
         // Создание фильтра в виде Expression
-        Expression<Func<Profile, bool>> filterExpression = x => 
+        Expression<Func<Profile, bool>> filterExpression = x =>
             x.Age >= filter.AgeFrom &&
             x.Age <= filter.AgeTo &&
             x.Sex == filter.Sex;
@@ -62,6 +63,11 @@ public class ProfileRepository : BaseRepository<DatingDbContext, Profile>, IProf
     public ValueTask<Profile?> GetProfileById(int profileId, CancellationToken cancellationToken)
     {
         return GetByIdAsync(profileId, cancellationToken);
+    }
+
+    public async Task<Profile?> GetProfileBySid(string sid, CancellationToken cancellationToken)
+    {
+        return await _context.Profiles.FirstOrDefaultAsync(p => p.Sid == sid);
     }
 
     public async Task SaveChangesAsync()

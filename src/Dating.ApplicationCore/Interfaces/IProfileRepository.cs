@@ -14,6 +14,8 @@ public interface IProfileRepository
     // Получение профиля по ID
     ValueTask<Profile?> GetProfileById(int profileId, CancellationToken cancellationToken);
 
+    Task<Profile?> GetProfileBySid(string sid, CancellationToken cancellationToken);
+
     // Получение профилей с фильтром и пагинацией
     Task<IEnumerable<Profile>> GetProfileByFilter(ProfileFilterDto filter, CancellationToken cancellationToken);
 
@@ -21,5 +23,6 @@ public interface IProfileRepository
     void UpdateProfile(Profile profile, CancellationToken cancellationToken);
 
     Task SaveChangesAsync();
+
     void DeleteProfile(Profile profile);
 }

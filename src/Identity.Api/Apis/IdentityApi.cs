@@ -11,11 +11,11 @@ public static class IdentityApi
     {
         var identityGroup = application.MapGroup("authorization");
 
-        identityGroup.MapPut    ("/",        UpdateUserAsync).RequireAuthorization().DisableAntiforgery();
-        identityGroup.MapPost   ("/",        RegisterUserAsync);
-        identityGroup.MapPost   ("/login",   LoginUserAsync); 
-        identityGroup.MapPost   ("/refresh", RefreshUserAsync).RequireAuthorization(); 
-        identityGroup.MapDelete ("/",        DeleteUserAsync); 
+        identityGroup.MapPut("/", UpdateUserAsync).RequireAuthorization().DisableAntiforgery();
+        identityGroup.MapPost("/", RegisterUserAsync);
+        identityGroup.MapPost("/login", LoginUserAsync);
+        identityGroup.MapPost("/refresh", RefreshUserAsync).RequireAuthorization();
+        identityGroup.MapDelete("/", DeleteUserAsync);
 
         return application;
     }
@@ -30,7 +30,7 @@ public static class IdentityApi
         }
 
         try
-        {   
+        {
             var result = await services.AuthorizationService.UpdateUserAsync(userIdClaim.Value, user);
 
             if (!result.Succeeded)
@@ -44,7 +44,7 @@ public static class IdentityApi
 
             return TypedResults.Ok();
         }
-        catch(Exception e) when (e is InvalidPasswordException || e is UserNotFoundException)
+        catch (Exception e) when (e is InvalidPasswordException || e is UserNotFoundException)
         {
             return TypedResults.BadRequest();
         }
@@ -85,7 +85,7 @@ public static class IdentityApi
 
             return TypedResults.Ok(new { JwtToken = jwttoken, RefreshToken = refresh });
         }
-        catch(Exception e) when (e is UserPasswordNotEquivalentException || e is ArgumentNullException || e is UserNotFoundException)
+        catch (Exception e) when (e is UserPasswordNotEquivalentException || e is ArgumentNullException || e is UserNotFoundException)
         {
             return TypedResults.BadRequest();
         }
@@ -103,7 +103,7 @@ public static class IdentityApi
 
             return TypedResults.NoContent();
         }
-        catch(UserNotFoundException)
+        catch (UserNotFoundException)
         {
             return TypedResults.BadRequest();
         }

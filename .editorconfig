@@ -1,0 +1,88 @@
+# Указываем, что это корневой файл конфигурации
+root = true
+
+# Общие настройки для всех файлов проекта
+[*]
+# Использовать 4 пробела для отступов
+indent_style = space
+indent_size = 4
+
+# Линии должны заканчиваться на LF
+end_of_line = lf
+
+# Кодировка UTF-8 без BOM
+charset = utf-8
+
+# Удалять лишние пробелы в конце строк
+trim_trailing_whitespace = true
+
+# Всегда вставлять пустую строку в конце файла
+insert_final_newline = true
+
+# Оставить символы пробела в строках, если они не используются
+max_line_length = 120
+
+# Отключаем предупреждения по неиспользуемым директивам #region
+dotnet_diagnostic.IDE0051.severity = none
+dotnet_diagnostic.IDE0052.severity = none
+
+# Ожидаем, что имена классов и методов будут использовать PascalCase
+[*.cs]
+# Размер отступов
+indent_style = space
+indent_size = 4
+
+# Отступы для внутристрочных блоков
+continuation_indent_size = 4
+
+# Стиль скобок: открывающая скобка на той же строке
+brace_style = next_line
+
+# Пример для выравнивания параметров конструктора
+# например, в строках метода
+align_multiline_arguments = true
+
+# Использование пробела после запятой в аргументах
+space_after_comma = true
+
+# Проверка на пустые строки в методах
+empty_lines_around_method = true
+
+# Правила для именования: 
+# В C# классы, методы и свойства должны быть в PascalCase
+dotnet_naming_rule.methods_and_properties_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.methods_and_properties_should_be_pascal_case.symbols = methods, properties
+dotnet_naming_rule.methods_and_properties_should_be_pascal_case.style = pascal_case
+
+# Пример для переменных: переменные должны быть в camelCase
+dotnet_naming_rule.local_variables_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.local_variables_should_be_camel_case.symbols = local_variables
+dotnet_naming_rule.local_variables_should_be_camel_case.style = camel_case
+
+# Рекомендации для именования методов
+dotnet_naming_rule.methods_should_be_named_using_camel_case.severity = suggestion
+dotnet_naming_rule.methods_should_be_named_using_camel_case.symbols = methods
+dotnet_naming_rule.methods_should_be_named_using_camel_case.style = camel_case
+
+# Например: сделать исключение для констант (они должны быть в UPPER_CASE)
+dotnet_naming_rule.constants_should_be_upper_case.severity = suggestion
+dotnet_naming_rule.constants_should_be_upper_case.symbols = constants
+dotnet_naming_rule.constants_should_be_upper_case.style = upper_case
+
+# Правила для организации using
+# Сортировать usings по алфавиту
+[*.cs]
+sort_usings = true
+
+# Удаление неиспользуемых usings
+remove_unnecessary_usings = true
+
+# Убираем лишние директивы using, которые не используются
+dotnet_diagnostic.CS8019.severity = none
+
+# Правила для форматирования параметров методов
+dotnet_diagnostic.CS1525.severity = warning
+dotnet_diagnostic.CS1030.severity = warning
+
+# Рекомендации по использованию await
+dotnet_diagnostic.CA2000.severity = warning

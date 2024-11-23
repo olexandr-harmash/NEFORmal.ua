@@ -7,16 +7,16 @@ namespace NEFORmal.ua.Dating.Infrastructure;
 
 public class DatingDbContext : DbContext
 {
-    public DbSet<Date>    Dates    { get; init; }
+    public DbSet<Date> Dates { get; init; }
     public DbSet<Profile> Profiles { get; init; }
 
-    public DatingDbContext(DbContextOptions<DatingDbContext> options) : base(options) {}
+    public DatingDbContext(DbContextOptions<DatingDbContext> options) : base(options) { }
 
-      protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfiguration(new DateEntityTypeConfiguration   ());
+        modelBuilder.ApplyConfiguration(new DateEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new ProfileEntityTypeConfiguration());
     }
 }

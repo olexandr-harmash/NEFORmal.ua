@@ -10,7 +10,7 @@ public class FileService : IFileService
 {
     private readonly ILogger<FileService> _logger;
     private readonly FileServiceOptions _options;
-    
+
     public FileService(ILogger<FileService> logger, IOptions<FileServiceOptions> options)
     {
         _logger = logger;
@@ -39,7 +39,7 @@ public class FileService : IFileService
         {
             fileResults.Add(await _saveFileAsync(file)); // Add safe filename to the list
         }
-        
+
         return fileResults;
     }
 
@@ -89,7 +89,7 @@ public class FileService : IFileService
             fileResult.Error = new ArgumentOutOfRangeException(nameof(formFile), "File size exceeds the limit.");
             return fileResult;
         }
-        
+
         var ext = Path.GetExtension(formFile.FileName).ToLowerInvariant();
 
         if (string.IsNullOrEmpty(ext) || !_options.PermittedExtensions.Contains(ext))
@@ -120,9 +120,10 @@ public class FileService : IFileService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.Message);
             fileResult.Error = new InvalidOperationException("An error occurred while saving the file.", ex);
         }
-        
+
         return fileResult;
     }
 
@@ -133,7 +134,7 @@ public class FileService : IFileService
             var signatures = FileServiceOptions.FileSignature[ext];
             var headerBytes = reader.ReadBytes(signatures.Max(m => m.Length));
 
-            return signatures.Any(signature => 
+            return signatures.Any(signature =>
                 headerBytes.Take(signature.Length).SequenceEqual(signature));
         }
     }

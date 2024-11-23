@@ -6,10 +6,10 @@ public class Profile
     public int Id { get; private set; }
 
     private string _sid;
-    public string Sid 
-    { 
-        get => _sid; 
-        private set 
+    public string Sid
+    {
+        get => _sid;
+        private set
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentException("SID cannot be null or empty.", nameof(Sid));
@@ -18,10 +18,10 @@ public class Profile
     }
 
     private string _name;
-    public string Name 
-    { 
-        get => _name; 
-        private set 
+    public string Name
+    {
+        get => _name;
+        private set
         {
             if (string.IsNullOrEmpty(value) || value.Length > 32)
                 throw new ArgumentException("Name must be between 1 and 32 characters.", nameof(Name));
@@ -30,10 +30,10 @@ public class Profile
     }
 
     private string _bio;
-    public string Bio 
-    { 
-        get => _bio; 
-        private set 
+    public string Bio
+    {
+        get => _bio;
+        private set
         {
             if (value.Length > 255)
                 throw new ArgumentException("Bio cannot be longer than 255 characters.", nameof(Bio));
@@ -42,10 +42,10 @@ public class Profile
     }
 
     private int _age;
-    public int Age 
-    { 
-        get => _age; 
-        private set 
+    public int Age
+    {
+        get => _age;
+        private set
         {
             if (value < 0 || value > 120)
                 throw new ArgumentException("Age must be between 0 and 120.", nameof(Age));
@@ -54,10 +54,10 @@ public class Profile
     }
 
     private string _sex;
-    public string Sex 
-    { 
-        get => _sex; 
-        private set 
+    public string Sex
+    {
+        get => _sex;
+        private set
         {
             if (string.IsNullOrEmpty(value) || (value != "Male" && value != "Female"))
                 throw new ArgumentException("Sex must be either 'Male' or 'Female'.", nameof(Sex));
@@ -67,10 +67,10 @@ public class Profile
 
     private IEnumerable<string> _profilePhotos;
 
-    public IEnumerable<string> ProfilePhotos 
-    { 
-        get => _profilePhotos; 
-        private set 
+    public IEnumerable<string> ProfilePhotos
+    {
+        get => _profilePhotos;
+        private set
         {
             if (value == null || !value.Any())
                 throw new ArgumentException("Profile must have at least one photo.", nameof(ProfilePhotos));
@@ -80,11 +80,11 @@ public class Profile
 
     public Profile(string sid, string name, string bio, int age, string sex)
     {
-        Sid  = sid;
+        Sid = sid;
         Name = name;
-        Bio  = bio;
-        Age  = age;
-        Sex  = sex;
+        Bio = bio;
+        Age = age;
+        Sex = sex;
     }
 
     public void UpdateAge(int newAge)

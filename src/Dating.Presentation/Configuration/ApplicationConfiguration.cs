@@ -6,7 +6,7 @@ namespace NEFORmal.ua.Dating.Presentation.Configuration;
 
 public static class ApplicationConfiguration
 {
-    public static WebApplicationBuilder ConfigureApplication(this WebApplicationBuilder  builder)
+    public static WebApplicationBuilder ConfigureApplication(this WebApplicationBuilder builder)
     {
         builder.Services.Configure<FileServiceOptions>(builder.Configuration.GetSection(FileServiceOptions.OptionString));
 

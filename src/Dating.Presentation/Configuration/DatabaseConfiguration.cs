@@ -7,14 +7,14 @@ namespace NEFORmal.ua.Dating.Presentation.Configuration;
 
 public static class DatabaseConfig
 {
-    public static async Task<WebApplicationBuilder> ConfigureDatabaseAsync(this WebApplicationBuilder  builder)
+    public static async Task<WebApplicationBuilder> ConfigureDatabaseAsync(this WebApplicationBuilder builder)
     {
         var connectionString = builder.Configuration.GetConnectionString("Database");
 
         ArgumentNullException.ThrowIfNullOrEmpty(connectionString);
 
-        builder.Services.AddDbContext<DatingDbContext>(opt => 
-            opt.UseNpgsql(connectionString, opt => 
+        builder.Services.AddDbContext<DatingDbContext>(opt =>
+            opt.UseNpgsql(connectionString, opt =>
                 opt.MigrationsAssembly("Dating.Infrastructure")
             )
         );
@@ -22,14 +22,11 @@ public static class DatabaseConfig
         builder.Services.AddScoped<DatingDbSeed>();
         builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
-        using (var scope = builder.Services.BuildServiceProvider().CreateScope())
+        if (builder.Environment.IsDevelopment())
         {
-            var seeder = scope.ServiceProvider.GetService<DatingDbSeed>();
-
-            ArgumentNullException.ThrowIfNull(seeder);
-
-            if (builder.Environment.IsDevelopment())
+            using (var scope = builder.Services.BuildServiceProvider().CreateScope())
             {
+                var seeder = scope.ServiceProvider.GetService<DatingDbSeed>();
                 await seeder.SeedAsync();
             }
         }

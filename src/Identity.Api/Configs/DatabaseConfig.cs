@@ -10,8 +10,8 @@ public static class DatabaseConfig
 
         ArgumentNullException.ThrowIfNullOrEmpty(connectionString);
 
-        services.AddDbContext<ApplicationDbContext>(opt => 
-            opt.UseNpgsql(connectionString, opt => 
+        services.AddDbContext<ApplicationDbContext>(opt =>
+            opt.UseNpgsql(connectionString, opt =>
                 opt.MigrationsAssembly("Identity.Api")
             )
         );

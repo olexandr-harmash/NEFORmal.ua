@@ -5,9 +5,9 @@ using NEFORmal.ua.Dating.ApplicationCore.Models;
 
 namespace NEFORmal.ua.Dating.Infrastructure.EntityTypeConfiguration;
 
-public class ProfileEntityTypeConfiguration  : IEntityTypeConfiguration<Profile>
+public class ProfileEntityTypeConfiguration : IEntityTypeConfiguration<Profile>
 {
-    public void Configure(EntityTypeBuilder<Profile> builder) 
+    public void Configure(EntityTypeBuilder<Profile> builder)
     {
         builder.HasKey(p => p.Id);
 
@@ -24,13 +24,13 @@ public class ProfileEntityTypeConfiguration  : IEntityTypeConfiguration<Profile>
 
         builder.Property(p => p.Sex)
             .IsRequired();
-        
+
         builder.Property(p => p.Sid)
             .IsRequired();
 
         builder.Property(p => p.ProfilePhotos)
             .IsRequired();
-        
+
         builder.HasIndex(p => new { p.Sex, p.Age })
             .HasDatabaseName("IX_Profile_Sex_Age");
     }

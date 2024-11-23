@@ -5,8 +5,8 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Interfaces;
 
 public interface IFileService
 {
-    Task<FileResult> SaveFileAsync (IFormFile file);
-    void DeleteFile (string filePath);
-    Task<IEnumerable<FileResult>> SaveFilesAsync (IEnumerable<IFormFile> file);
-    void DeleteFiles (IEnumerable<string> filePaths);
+    Task<FileResult> SaveFileAsync(IFormFile file);
+    void DeleteFile(string filePath);
+    Task<IEnumerable<FileResult>> SaveFilesAsync(IEnumerable<IFormFile> file);
+    void DeleteFiles(IEnumerable<string> filePaths);
 }

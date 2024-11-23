@@ -50,18 +50,15 @@ public class Date
         }
     }
 
-    
-    public Profile? Sender   { get; set; }
+    public Profile? Sender { get; set; }
     public Profile? Receiver { get; set; }
 
-    public Date(int senderId, int receiverId, bool isApproved = false, string? message = "", Profile? sender = null, Profile? receiver = null)
+    public Date(int senderId, int receiverId, bool isApproved = false, string? message = "")
     {
-        SenderId   = senderId;
+        SenderId = senderId;
         ReceiverId = receiverId;
         IsApproved = isApproved;
-        Message    = message;
-        Receiver   = receiver;
-        Sender     = sender;
+        Message = message;
     }
 
     public void Approve()

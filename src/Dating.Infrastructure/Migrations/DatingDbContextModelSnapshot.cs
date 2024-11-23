@@ -59,7 +59,7 @@ namespace Dating.Infrastructure.Migrations
                     b.Property<int>("Age")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Bio")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
@@ -87,6 +87,25 @@ namespace Dating.Infrastructure.Migrations
                         .HasDatabaseName("IX_Profile_Sex_Age");
 
                     b.ToTable("Profiles");
+                });
+
+            modelBuilder.Entity("NEFORmal.ua.Dating.ApplicationCore.Models.Date", b =>
+                {
+                    b.HasOne("NEFORmal.ua.Dating.ApplicationCore.Models.Profile", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NEFORmal.ua.Dating.ApplicationCore.Models.Profile", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 #pragma warning restore 612, 618
         }

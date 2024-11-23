@@ -5,9 +5,10 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Interfaces;
 
 public interface IProfileService
 {
-    Task CreateProfile (CreateProfileDto profile);
-    Task DeleteProfile (int profileId, CancellationToken cancellationToken);
-    Task UpdateProfile (int profileId, UpdateProfileDto profile, CancellationToken cancellationToken);
-    Task<ProfileDto> GetProfileById (int profileId, CancellationToken cancellationToken);
-    Task<IEnumerable<ProfileDto>> GetProfileByFilter (ProfileFilterDto filter, CancellationToken cancellationToken);
+    Task CreateProfile(CreateProfileDto profile);
+    Task DeleteProfile(int profileId, CancellationToken cancellationToken);
+    Task UpdateProfile(int profileId, UpdateProfileDto profile, CancellationToken cancellationToken);
+    Task<ProfileDto> GetProfileById(int profileId, CancellationToken cancellationToken);
+    Task<ProfileDto> GetProfileBySid(string sid, CancellationToken cancellationToken);
+    Task<IEnumerable<ProfileDto>> GetProfileByFilter(ProfileFilterDto filter, CancellationToken cancellationToken);
 }

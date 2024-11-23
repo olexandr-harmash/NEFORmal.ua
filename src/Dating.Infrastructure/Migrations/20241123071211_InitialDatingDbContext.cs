@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -12,6 +12,24 @@ namespace Dating.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Profiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Sid = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    Bio = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Age = table.Column<int>(type: "integer", nullable: false),
+                    Sex = table.Column<string>(type: "text", nullable: false),
+                    ProfilePhotos = table.Column<string[]>(type: "text[]", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profiles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Dates",
                 columns: table => new
                 {
@@ -23,24 +41,18 @@ namespace Dating.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Dates", x => new { x.SenderId, x.ReceiverId });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Profiles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Sid = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    Description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Age = table.Column<int>(type: "integer", nullable: false),
-                    Sex = table.Column<string>(type: "text", nullable: false),
-                    ProfilePhotos = table.Column<string[]>(type: "text[]", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Profiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Dates_Profiles_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Dates_Profiles_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

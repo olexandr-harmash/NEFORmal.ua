@@ -12,6 +12,8 @@ public static class ApplicationConfiguration
 
         builder.Services.AddScoped<IFileService, FileService>();
         builder.Services.AddScoped<IProfileService, ProfileService>();
+        builder.Services.AddScoped<ICreateProfileSagaService, CreateProfileSagaService>();
+        builder.Services.AddScoped<IUpdateProfileSagaService, UpdateProfileSagaService>();
 
         return builder;
     }

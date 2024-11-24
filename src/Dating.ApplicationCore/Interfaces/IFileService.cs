@@ -9,4 +9,5 @@ public interface IFileService
     void DeleteFile(string filePath);
     Task<IEnumerable<FileResult>> SaveFilesAsync(IEnumerable<IFormFile> file);
     void DeleteFiles(IEnumerable<string> filePaths);
+    Task<List<string>> SafeFilesOrThrowErrorAsync(IEnumerable<IFormFile> formFiles);
 }

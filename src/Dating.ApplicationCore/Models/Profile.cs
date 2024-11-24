@@ -1,8 +1,11 @@
 
+using Microsoft.Net.Http.Headers;
+
 namespace NEFORmal.ua.Dating.ApplicationCore.Models;
 
 public class Profile
 {
+    public List<string> LastFiles { get; private set; }
     public int Id { get; private set; }
 
     private string _sid;
@@ -78,13 +81,14 @@ public class Profile
         }
     }
 
-    public Profile(string sid, string name, string bio, int age, string sex)
+    public Profile(string sid, string name, string bio, int age, string sex, List<string> fileNames)
     {
         Sid = sid;
         Name = name;
         Bio = bio;
         Age = age;
         Sex = sex;
+        ProfilePhotos = fileNames;
     }
 
     public void UpdateAge(int newAge)
@@ -109,6 +113,40 @@ public class Profile
 
     public void UpdateProfilePhotos(IEnumerable<string> profilePhotos)
     {
+        LastFiles = ProfilePhotos.ToList();
         ProfilePhotos = profilePhotos;
+    }
+
+    public void UpdateProfile(string? name, string? bio, int? age, string? sex, List<string>? fileNames)
+    {
+        // Обновляем имя, если оно не null
+        if (!string.IsNullOrEmpty(name))
+        {
+            UpdateName(name);
+        }
+
+        // Обновляем биографию, если она не null
+        if (!string.IsNullOrEmpty(bio))
+        {
+            UpdateBio(bio);
+        }
+
+        // Обновляем возраст, если он не null
+        if (age.HasValue)
+        {
+            UpdateAge(age.Value);
+        }
+
+        // Обновляем пол, если он не null
+        if (!string.IsNullOrEmpty(sex))
+        {
+            UpdateSex(sex);
+        }
+
+        // Обновляем фотографии профиля, если они не null
+        if (fileNames != null && fileNames.Any())
+        {
+            UpdateProfilePhotos(fileNames);
+        }
     }
 }

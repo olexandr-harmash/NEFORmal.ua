@@ -70,9 +70,9 @@ public class ProfileRepository : BaseRepository<DatingDbContext, Profile>, IProf
         return await _context.Profiles.FirstOrDefaultAsync(p => p.Sid == sid);
     }
 
-    public async Task SaveChangesAsync()
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     // Обновление профиля

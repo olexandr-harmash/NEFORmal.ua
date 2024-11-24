@@ -22,7 +22,7 @@ public interface IProfileRepository
     // Обновление профиля
     void UpdateProfile(Profile profile, CancellationToken cancellationToken);
 
-    Task SaveChangesAsync();
+    Task SaveChangesAsync(CancellationToken cancellationToken);
 
     void DeleteProfile(Profile profile);
 }

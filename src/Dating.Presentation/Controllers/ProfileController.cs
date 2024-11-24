@@ -11,12 +11,16 @@ namespace NEFORmal.ua.Dating.Api.Controllers
     [Authorize] // Ожидаем, что пользователь будет аутентифицирован
     public class ProfileController : ControllerBase
     {
+        private readonly IUpdateProfileSagaService _updateProfileSagaService;
+        private readonly ICreateProfileSagaService _createProfileSagaService;
         private readonly IProfileService _profileService;
         private readonly ILogger<ProfileController> _logger;
 
-        public ProfileController(IProfileService profileService, ILogger<ProfileController> logger)
+        public ProfileController(ICreateProfileSagaService createProfileSagaService, IUpdateProfileSagaService updateProfileSagaService, IProfileService profileService, ILogger<ProfileController> logger)
         {
             _profileService = profileService;
+            _createProfileSagaService = createProfileSagaService;
+            _updateProfileSagaService = updateProfileSagaService;
             _logger = logger;
         }
 
@@ -65,11 +69,11 @@ namespace NEFORmal.ua.Dating.Api.Controllers
 
         // Создание профиля
         [HttpPost]
-        public async Task<IActionResult> CreateProfile([FromForm] CreateProfileDto profileForCreate)
+        public async Task<IActionResult> CreateProfile([FromForm] CreateProfileDto profileForCreate, CancellationToken cancellationToken)
         {
             try
             {
-                await _profileService.CreateProfile(profileForCreate);
+                await _createProfileSagaService.ProcessProfileAsync(profileForCreate, cancellationToken);
                 return CreatedAtAction(nameof(GetProfileById), new { profileId = profileForCreate.Sid }, profileForCreate);
             }
             catch (Exception ex)
@@ -85,7 +89,7 @@ namespace NEFORmal.ua.Dating.Api.Controllers
         {
             try
             {
-                await _profileService.UpdateProfile(profileId, profile, cancellationToken);
+                await _updateProfileSagaService.UpdateProfileAsync(profileId, profile, cancellationToken);
                 return NoContent(); // Возвращаем успешный ответ без тела
             }
             catch (Exception ex)

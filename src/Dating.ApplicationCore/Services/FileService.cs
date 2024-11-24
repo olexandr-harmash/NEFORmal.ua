@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
+using NEFORmal.ua.Dating.ApplicationCore.Exceptions;
 using NEFORmal.ua.Dating.ApplicationCore.Interfaces;
 
 namespace NEFORmal.ua.Dating.ApplicationCore.Services;
@@ -137,14 +137,37 @@ public class FileService : IFileService
                 headerBytes.Take(signature.Length).SequenceEqual(signature));
         }
     }
+
+    public async Task<List<string>> SafeFilesOrThrowErrorAsync(IEnumerable<IFormFile> formFiles)
+    {
+        var getNames = (IEnumerable<IFormFile> formFiles) => formFiles.Select(f => f.FileName).ToList();
+        
+        // Save the files and get the results
+        IEnumerable<FileResult> fileResults = await SaveFilesAsync(formFiles);
+
+        // Check if any file had an error
+        var errorResult = fileResults.FirstOrDefault(r => r.Error != null);
+
+        if (errorResult != null)
+        {
+            // Throw a SafeFileException with the error message and the list of filenames
+            throw new SafeFileException(errorResult.Error.Message)
+            {
+                FileNames = getNames(formFiles)
+            };
+        }
+
+        // If no errors, return the safe filenames of all saved files
+        return getNames(formFiles);
+    }
 }
 
 public record FileResult
 {
-    public string UnsafeFilename { get; set; } = string.Empty;
-    public string? SafeFilename { get; set; }
-    public string? MimeType { get; set; }
-    public string? FullFilename { get; set; }
+    public string UnsafeFilename { get; set; }
+    public string SafeFilename { get; set; }
+    public string MimeType { get; set; }
+    public string FullFilename { get; set; }
     public long FileSize { get; set; }
     public Exception? Error { get; set; } = default;
 }

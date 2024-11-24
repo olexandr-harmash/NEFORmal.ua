@@ -13,8 +13,8 @@ public static class AuthrizationConfig
 
         var secretKey = Environment.GetEnvironmentVariable("SECRET");
 
-        ArgumentNullException.ThrowIfNullOrEmpty (secretKey);
-        ArgumentNullException.ThrowIfNull        (jwtSettings);
+        ArgumentNullException.ThrowIfNullOrEmpty(secretKey);
+        ArgumentNullException.ThrowIfNull(jwtSettings);
 
         services.AddAuthentication(opt =>
         {
@@ -25,13 +25,13 @@ public static class AuthrizationConfig
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer           = true,
-                ValidateAudience         = true,
-                ValidateLifetime         = true,
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer              = jwtSettings.Issuer,
-                ValidAudience            = jwtSettings.Audience,
-                IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
             };
         });
 

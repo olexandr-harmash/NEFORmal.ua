@@ -7,7 +7,7 @@ public static class IdentityServicesConfig
     public static IServiceCollection ConfigureIdentityServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtTokenOptions>(configuration.GetSection("JwtSettings"));
-        
+
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthorizationService, AuthorizationService>();
         services.AddScoped<IdentityServices>();

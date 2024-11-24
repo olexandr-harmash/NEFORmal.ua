@@ -10,11 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.ConfigureDatabase         (builder.Configuration);
-builder.Services.ConfigureIdentity         ();
-builder.Services.ConfigureIdentityServices (builder.Configuration);
-builder.Services.ConfigureAuthentication   (builder.Configuration);
-builder.Services.AddAuthorization          ();
+builder.Services.ConfigureDatabase(builder.Configuration);
+builder.Services.ConfigureIdentity();
+builder.Services.ConfigureIdentityServices(builder.Configuration);
+builder.Services.ConfigureAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

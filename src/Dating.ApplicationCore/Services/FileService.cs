@@ -53,7 +53,6 @@ public class FileService : IFileService
             {
                 return;
             }
-
             File.Delete(filePath);
         }
         catch (Exception deleteEx)
@@ -74,8 +73,11 @@ public class FileService : IFileService
     {
         var fileResult = new FileResult
         {
-            UnsafeFilename = formFile.Name,
+            UnsafeFilename = Path.GetFileNameWithoutExtension(formFile.FileName),
             FileSize = formFile.Length,
+            MimeType = Path.GetExtension(formFile.FileName),
+            SafeFilename = Path.GetRandomFileName(),
+            FullFilename = formFile.FileName
         };
 
         if (formFile.Length == 0)
@@ -90,7 +92,7 @@ public class FileService : IFileService
             return fileResult;
         }
 
-        var ext = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+        var ext = fileResult.MimeType.TrimStart('.');
 
         if (string.IsNullOrEmpty(ext) || !_options.PermittedExtensions.Contains(ext))
         {
@@ -98,10 +100,7 @@ public class FileService : IFileService
             return fileResult;
         }
 
-        var filename = Path.GetRandomFileName();
-        var filePath = Path.Combine(_options.StoredFilesPath, filename);
-
-        fileResult.SafeFilename = filename;
+        var filePath = Path.Combine(_options.StoredFilesPath, $"{fileResult.SafeFilename}{fileResult.MimeType}");
 
         try
         {
@@ -144,6 +143,8 @@ public record FileResult
 {
     public string UnsafeFilename { get; set; } = string.Empty;
     public string? SafeFilename { get; set; }
+    public string? MimeType { get; set; }
+    public string? FullFilename { get; set; }
     public long FileSize { get; set; }
     public Exception? Error { get; set; } = default;
 }

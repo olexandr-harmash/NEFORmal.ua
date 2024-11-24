@@ -81,7 +81,7 @@ namespace NEFORmal.ua.Dating.Api.Controllers
 
         // Обновление профиля
         [HttpPut("{profileId}")]
-        public async Task<IActionResult> UpdateProfile(int profileId, [FromBody] UpdateProfileDto profile, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateProfile(int profileId, [FromForm] UpdateProfileDto profile, CancellationToken cancellationToken)
         {
             try
             {

@@ -106,7 +106,7 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
                 appProfile.ProfilePhotos);
         }
 
-        public async Task UpdateProfile(int profileId, UpdateProfileDto profile, CancellationToken cancellationToken) // TODO: transaction
+        public async Task UpdateProfile(int profileId, UpdateProfileDto updateProfileDto, CancellationToken cancellationToken) // TODO: transaction
         {
             var appProfile = await _profileRepo.GetProfileById(profileId, cancellationToken);
 
@@ -115,26 +115,39 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
                 throw new Exception();
             }
 
-            var oldFilePaths = appProfile.ProfilePhotos;
-
-            var filePaths = await _safeProfileFilesAsync(profile.ProfilePhotos);
+            var oldFileNames = appProfile.ProfilePhotos;
+            
+            var fileNames = await _safeProfileFilesAsync(updateProfileDto.ProfilePhotos);
 
             try
             {
-                appProfile.UpdateProfilePhotos(filePaths);
+                appProfile.UpdateProfilePhotos(fileNames);
+
+                if (!string.IsNullOrWhiteSpace(updateProfileDto.Bio)) 
+                    appProfile.UpdateBio(updateProfileDto.Bio);
+
+                if (!string.IsNullOrWhiteSpace(updateProfileDto.Name)) 
+                    appProfile.UpdateName(updateProfileDto.Name);
+
+                if (!string.IsNullOrWhiteSpace(updateProfileDto.Sex)) 
+                    appProfile.UpdateSex(updateProfileDto.Sex);
+
+                if (updateProfileDto.Age.HasValue) 
+                    appProfile.UpdateAge(updateProfileDto.Age.Value);
 
                 _profileRepo.UpdateProfile(appProfile, cancellationToken);
 
                 await _profileRepo.SaveChangesAsync();
 
-                if (oldFilePaths.Any())
+                if (oldFileNames.Any())
                 {
-                    _fileService.DeleteFiles(appProfile.ProfilePhotos);
+                    _fileService.DeleteFiles(oldFileNames);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                _fileService.DeleteFiles(filePaths);
+                _logger.LogError(ex.Message);
+                _fileService.DeleteFiles(fileNames);
                 throw;
             }
         }
@@ -150,7 +163,7 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
             if (errorResult != null)
             {
                 // Log the error and clean up any files that were already saved
-                _fileService.DeleteFiles(fileResults.Select(fr => fr.SafeFilename));
+                _fileService.DeleteFiles(fileResults.Select(fr => fr.SafeFilename).ToList());
 
                 // Throw a SafeFileException with the error message and the list of filenames
                 throw new SafeFileException(errorResult.Error.Message)
@@ -160,7 +173,7 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
             }
 
             // If no errors, return the safe filenames of all saved files
-            return fileResults.Select(fr => fr.SafeFilename);
+            return fileResults.Select(fr => fr.SafeFilename).ToList();
         }
     }
 }

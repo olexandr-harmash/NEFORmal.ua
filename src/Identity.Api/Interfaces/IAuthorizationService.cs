@@ -11,3 +11,4 @@ public interface IAuthorizationService
     Task<IdentityResult> RegisterUserAsync(RegisterUserDto user);
     Task<IdentityResult> UpdateUserAsync(string userid, UpdateUserDto user);
 }
+

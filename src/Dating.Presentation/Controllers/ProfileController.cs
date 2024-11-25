@@ -7,9 +7,12 @@ using NEFORmal.ua.Dating.Presentation.Requests;
 
 namespace NEFORmal.ua.Dating.Api.Controllers
 {
+    /// <summary>
+    /// Controller responsible for handling user profile operations.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Ожидаем, что пользователь будет аутентифицирован
+    [Authorize] // Ensures the user is authenticated
     public class ProfileController : ControllerBase
     {
         private readonly IUpdateProfileSagaUseCase _updateProfileSagaUseCase;
@@ -17,6 +20,13 @@ namespace NEFORmal.ua.Dating.Api.Controllers
         private readonly IProfileService _profileService;
         private readonly ILogger<ProfileController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfileController"/> class.
+        /// </summary>
+        /// <param name="createProfileSagaService">Service for handling profile creation.</param>
+        /// <param name="updateProfileSagaUseCase">Service for handling profile updates.</param>
+        /// <param name="profileService">Service for handling profile data retrieval and deletion.</param>
+        /// <param name="logger">Logger for logging actions within the controller.</param>
         public ProfileController(ICreateProfileSagaUseCase createProfileSagaService, IUpdateProfileSagaUseCase updateProfileSagaUseCase, IProfileService profileService, ILogger<ProfileController> logger)
         {
             _profileService = profileService;
@@ -25,7 +35,11 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             _logger = logger;
         }
 
-        // Получение текущего профиля с использованием Sid из JWT токена
+        /// <summary>
+        /// Gets the current profile of the authenticated user based on their Sid from the JWT token.
+        /// </summary>
+        /// <param name="cancellationToken">Token to monitor the cancellation of the operation.</param>
+        /// <returns>An <see cref="IActionResult"/> containing the profile data or an error message.</returns>
         [HttpGet("me")]
         public async Task<IActionResult> GetMyProfile(CancellationToken cancellationToken)
         {
@@ -35,19 +49,25 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             {
                 return Unauthorized("Sid not found in the token.");
             }
-            
+
             try
             {
                 var profile = await _profileService.GetProfileBySid(sid, cancellationToken);
                 return Ok(profile);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                  _logger.LogError(ex, "Error getting profile.");
+                _logger.LogError(ex, "Error getting profile.");
                 return StatusCode(500);
             }
         }
 
-        // Получение профиля по ID
+        /// <summary>
+        /// Retrieves a profile by its unique identifier.
+        /// </summary>
+        /// <param name="profileId">The unique identifier of the profile to retrieve.</param>
+        /// <param name="cancellationToken">Token to monitor the cancellation of the operation.</param>
+        /// <returns>An <see cref="IActionResult"/> containing the profile data or a "not found" message.</returns>
         [HttpGet("{profileId}")]
         public async Task<IActionResult> GetProfileById(int profileId, CancellationToken cancellationToken)
         {
@@ -61,7 +81,12 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             return Ok(profile);
         }
 
-        // Получение профилей с фильтром
+        /// <summary>
+        /// Retrieves a list of profiles filtered by the provided criteria.
+        /// </summary>
+        /// <param name="filter">The filtering criteria for retrieving profiles.</param>
+        /// <param name="cancellationToken">Token to monitor the cancellation of the operation.</param>
+        /// <returns>An <see cref="IActionResult"/> containing a list of profiles matching the filter.</returns>
         [HttpGet]
         public async Task<IActionResult> GetProfilesByFilter([FromQuery] ProfileFilterDto filter, CancellationToken cancellationToken)
         {
@@ -69,7 +94,12 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             return Ok(profiles);
         }
 
-        // Создание профиля
+        /// <summary>
+        /// Creates a new profile for the authenticated user.
+        /// </summary>
+        /// <param name="createProfileRequest">The data needed to create a new profile.</param>
+        /// <param name="cancellationToken">Token to monitor the cancellation of the operation.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating whether the profile was successfully created.</returns>
         [HttpPost]
         public async Task<IActionResult> CreateProfile([FromForm] CreateProfileRequest createProfileRequest, CancellationToken cancellationToken)
         {
@@ -110,9 +140,14 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             }
         }
 
-        // Обновление профиля
+        /// <summary>
+        /// Updates an existing profile for the authenticated user.
+        /// </summary>
+        /// <param name="updateProfileRequest">The updated profile data.</param>
+        /// <param name="cancellationToken">Token to monitor the cancellation of the operation.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating whether the profile was successfully updated.</returns>
         [HttpPut("{profileId}")]
-        public async Task<IActionResult> UpdateProfile(int profileId, [FromForm] UpdateProfileRequest updateProfileRequest, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateProfile([FromForm] UpdateProfileRequest updateProfileRequest, CancellationToken cancellationToken)
         {
             var sid = User.FindFirst(ClaimTypes.Sid)?.Value;
 
@@ -124,7 +159,6 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             try
             {
                 var profileForUpdate = new UpdateProfileDto(
-                    sid,
                     updateProfileRequest.Name,
                     updateProfileRequest.Sex,
                     updateProfileRequest.Bio,
@@ -133,11 +167,11 @@ namespace NEFORmal.ua.Dating.Api.Controllers
 
                 var formFiles = updateProfileRequest.ProfilePhotos.ToList();
 
-                var isOk = await _updateProfileSagaUseCase.UpdateProfileAsync(profileId, profileForUpdate, formFiles, cancellationToken);
+                var isOk = await _updateProfileSagaUseCase.UpdateProfileAsync(sid, profileForUpdate, formFiles, cancellationToken);
 
                 if (isOk)
                 {
-                    return NoContent(); // Возвращаем успешный ответ без тела
+                    return NoContent(); // No content returned on success
                 }
                 else
                 {
@@ -151,14 +185,25 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             }
         }
 
-        // Удаление профиля
+        /// <summary>
+        /// Deletes the current profile of the authenticated user.
+        /// </summary>
+        /// <param name="cancellationToken">Token to monitor the cancellation of the operation.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the profile deletion.</returns>
         [HttpDelete("{profileId}")]
-        public async Task<IActionResult> DeleteProfile(int profileId, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteProfile(CancellationToken cancellationToken)
         {
+            var sid = User.FindFirst(ClaimTypes.Sid)?.Value;
+
+            if (string.IsNullOrEmpty(sid))
+            {
+                return Unauthorized("Sid not found in the token.");
+            }
+
             try
             {
-                await _profileService.DeleteProfile(profileId, cancellationToken);
-                return NoContent(); // Успешное удаление
+                await _profileService.DeleteProfile(sid, cancellationToken);
+                return NoContent(); // No content returned on successful deletion
             }
             catch (Exception ex)
             {

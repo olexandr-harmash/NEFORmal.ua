@@ -24,7 +24,7 @@ public class JwtTokenService : IJwtTokenService
 
         var key = Encoding.UTF8.GetBytes(secretKey);
         var secret = new SymmetricSecurityKey(key);
-        
+
         var signingCredentials = new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>

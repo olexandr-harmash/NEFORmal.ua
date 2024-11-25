@@ -5,6 +5,6 @@ namespace NEFORmal.ua.Identity.Api.Interfaces;
 
 public interface IJwtTokenService
 {
-    string CreateJwtToken     (ApplicationUser user);
-    string CreateRefreshToken ();
+    string CreateJwtToken(ApplicationUser user);
+    string CreateRefreshToken();
 }

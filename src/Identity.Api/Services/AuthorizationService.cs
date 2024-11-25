@@ -9,15 +9,15 @@ namespace NEFORmal.ua.Identity.Api.Services;
 
 public class AuthorizationService : IAuthorizationService
 {
-    private readonly IJwtTokenService              _tokenService;
-    private readonly UserManager<ApplicationUser>  _userManager;
+    private readonly IJwtTokenService _tokenService;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<AuthorizationService> _logger;
 
     public AuthorizationService(UserManager<ApplicationUser> userManager, IJwtTokenService tokenService, ILogger<AuthorizationService> logger)
     {
-        _userManager  = userManager;
+        _userManager = userManager;
         _tokenService = tokenService;
-        _logger       = logger;
+        _logger = logger;
     }
 
     public async Task DeleteUserAsync(string userid)
@@ -52,7 +52,7 @@ public class AuthorizationService : IAuthorizationService
         {
             appuser = await _userManager.FindByEmailAsync(email);
         }
- 
+
         if (appuser == null)
         {
             throw new UserNotFoundException();
@@ -66,12 +66,12 @@ public class AuthorizationService : IAuthorizationService
         }
 
         var jwttoken = _tokenService.CreateJwtToken(appuser);
-        var refresh  = _tokenService.CreateRefreshToken();
+        var refresh = _tokenService.CreateRefreshToken();
 
         appuser.RefreshToken = refresh;
 
         await _userManager.UpdateAsync(appuser);
- 
+
         return (jwttoken, refresh);
     }
 
@@ -90,7 +90,7 @@ public class AuthorizationService : IAuthorizationService
         }
 
         var jwttoken = _tokenService.CreateJwtToken(appuser);
-        var refresh  = _tokenService.CreateRefreshToken();
+        var refresh = _tokenService.CreateRefreshToken();
 
         appuser.RefreshToken = refresh;
 
@@ -109,7 +109,7 @@ public class AuthorizationService : IAuthorizationService
         }
 
         var newuser = new ApplicationUser
-        { 
+        {
             UserName = user.UserName,
             Email = user.Email
         };
@@ -172,7 +172,7 @@ public class AuthorizationService : IAuthorizationService
     }
 
     private async Task<string> SaveFileAsync(IFormFile file)
-    {   
+    {
         var filename = $"{Guid.NewGuid()}_{file.FileName}";
 
         try
@@ -185,7 +185,7 @@ public class AuthorizationService : IAuthorizationService
             }
 
             return filePath;
-        } 
+        }
         catch
         {
             throw new SaveFileException();

@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Dating.Infrastructure.Migrations
 {
     [DbContext(typeof(DatingDbContext))]
-    [Migration("20241123071211_InitialDatingDbContext")]
+    [Migration("20241125051914_InitialDatingDbContext")]
     partial class InitialDatingDbContext
     {
         /// <inheritdoc />

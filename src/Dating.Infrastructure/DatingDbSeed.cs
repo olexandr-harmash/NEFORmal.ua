@@ -18,29 +18,28 @@ public class DatingDbSeed
 
         if (!_context.Set<Profile>().Any())
         {
-            var profile1 = new Profile
+            var profiles = new List<Profile>
+            { 
+                new Profile
                 (
                     "SID001",
                     "John Doe",
                     "A software developer who loves coding.",
                     30,
-                    "Male"
-                );
+                    "Male",
+                    new List<string> { "photo1.jpg", "photo2.jpg" }
+                ),
 
-            profile1.UpdateProfilePhotos(new List<string> { "photo1.jpg", "photo2.jpg" });
-
-            var profile2 = new Profile
+                new Profile
                 (
                     "SID002",
                     "Jane Smith",
                     "An artist who enjoys painting and photography.",
                     28,
-                    "Female"
-                );
-
-            profile2.UpdateProfilePhotos(new List<string> { "photo1.jpg", "photo2.jpg" });
-
-            var profiles = new List<Profile> { profile1, profile2 };
+                    "Female",
+                    new List<string> { "photo1.jpg", "photo2.jpg" }
+                )
+            };
 
             _context.Set<Profile>().AddRange(profiles);
             await _context.SaveChangesAsync();

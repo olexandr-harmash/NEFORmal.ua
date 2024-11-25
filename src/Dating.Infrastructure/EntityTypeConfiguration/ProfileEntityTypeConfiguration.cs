@@ -33,5 +33,7 @@ public class ProfileEntityTypeConfiguration : IEntityTypeConfiguration<Profile>
 
         builder.HasIndex(p => new { p.Sex, p.Age })
             .HasDatabaseName("IX_Profile_Sex_Age");
+        
+        builder.Ignore(p => p.LastFiles);
     }
 }

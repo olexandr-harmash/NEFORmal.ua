@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using NEFORmal.ua.Dating.ApplicationCore.Interfaces;
 using NEFORmal.ua.Dating.ApplicationCore.Services;
+using NEFORmal.ua.Dating.Presentation.UseCases;
 
 namespace NEFORmal.ua.Dating.Presentation.Configuration;
 
@@ -12,8 +13,8 @@ public static class ApplicationConfiguration
 
         builder.Services.AddScoped<IFileService, FileService>();
         builder.Services.AddScoped<IProfileService, ProfileService>();
-        builder.Services.AddScoped<ICreateProfileSagaService, CreateProfileSagaService>();
-        builder.Services.AddScoped<IUpdateProfileSagaService, UpdateProfileSagaService>();
+        builder.Services.AddScoped<ICreateProfileSagaUseCase, CreateProfileSagaUseCase>();
+        builder.Services.AddScoped<IUpdateProfileSagaUseCase, UpdateProfileSagaUseCase>();
 
         return builder;
     }

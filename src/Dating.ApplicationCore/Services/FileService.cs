@@ -49,11 +49,10 @@ public class FileService : IFileService
         {
             var filePath = Path.Combine(_options.StoredFilesPath, fileName);
 
-            if (!File.Exists(filePath))
+            if (File.Exists(filePath))
             {
-                return;
+                File.Delete(filePath);
             }
-            File.Delete(filePath);
         }
         catch (Exception deleteEx)
         {
@@ -92,7 +91,7 @@ public class FileService : IFileService
             return fileResult;
         }
 
-        var ext = fileResult.MimeType.TrimStart('.');
+        var ext = fileResult.MimeType;
 
         if (string.IsNullOrEmpty(ext) || !_options.PermittedExtensions.Contains(ext))
         {
@@ -106,12 +105,15 @@ public class FileService : IFileService
         {
             using (var stream = File.Create(filePath))
             {
-                var result = ValidateSignature(stream, ext);
-
-                if (!result)
+                if (_options.ValidateFileSignature)
                 {
-                    fileResult.Error = new InvalidOperationException("File signature validation failed.");
-                    return fileResult;
+                    var result = ValidateSignature(stream, ext);
+
+                    if (!result)
+                    {
+                        fileResult.Error = new InvalidOperationException("File signature validation failed.");
+                        return fileResult;
+                    }
                 }
 
                 await formFile.CopyToAsync(stream);
@@ -140,8 +142,8 @@ public class FileService : IFileService
 
     public async Task<List<string>> SafeFilesOrThrowErrorAsync(IEnumerable<IFormFile> formFiles)
     {
-        var getNames = (IEnumerable<IFormFile> formFiles) => formFiles.Select(f => f.FileName).ToList();
-        
+        var getNames = (IEnumerable<FileResult> fileResults) => fileResults.Select(f => f.SafeFilename + f.MimeType).ToList();
+       
         // Save the files and get the results
         IEnumerable<FileResult> fileResults = await SaveFilesAsync(formFiles);
 
@@ -153,12 +155,12 @@ public class FileService : IFileService
             // Throw a SafeFileException with the error message and the list of filenames
             throw new SafeFileException(errorResult.Error.Message)
             {
-                FileNames = getNames(formFiles)
+                FileNames = getNames(fileResults)
             };
         }
 
         // If no errors, return the safe filenames of all saved files
-        return getNames(formFiles);
+        return getNames(fileResults);
     }
 }
 

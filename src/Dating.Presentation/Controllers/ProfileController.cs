@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NEFORmal.ua.Dating.ApplicationCore.Dtos;
 using NEFORmal.ua.Dating.ApplicationCore.Interfaces;
+using NEFORmal.ua.Dating.Presentation.Requests;
 
 namespace NEFORmal.ua.Dating.Api.Controllers
 {
@@ -11,16 +12,16 @@ namespace NEFORmal.ua.Dating.Api.Controllers
     [Authorize] // Ожидаем, что пользователь будет аутентифицирован
     public class ProfileController : ControllerBase
     {
-        private readonly IUpdateProfileSagaService _updateProfileSagaService;
-        private readonly ICreateProfileSagaService _createProfileSagaService;
+        private readonly IUpdateProfileSagaUseCase _updateProfileSagaUseCase;
+        private readonly ICreateProfileSagaUseCase _createProfileSagaService;
         private readonly IProfileService _profileService;
         private readonly ILogger<ProfileController> _logger;
 
-        public ProfileController(ICreateProfileSagaService createProfileSagaService, IUpdateProfileSagaService updateProfileSagaService, IProfileService profileService, ILogger<ProfileController> logger)
+        public ProfileController(ICreateProfileSagaUseCase createProfileSagaService, IUpdateProfileSagaUseCase updateProfileSagaUseCase, IProfileService profileService, ILogger<ProfileController> logger)
         {
             _profileService = profileService;
             _createProfileSagaService = createProfileSagaService;
-            _updateProfileSagaService = updateProfileSagaService;
+            _updateProfileSagaUseCase = updateProfileSagaUseCase;
             _logger = logger;
         }
 
@@ -34,13 +35,14 @@ namespace NEFORmal.ua.Dating.Api.Controllers
             {
                 return Unauthorized("Sid not found in the token.");
             }
-
+            
             try
             {
                 var profile = await _profileService.GetProfileBySid(sid, cancellationToken);
                 return Ok(profile);
-            } catch
+            } catch (Exception ex)
             {
+                  _logger.LogError(ex, "Error getting profile.");
                 return StatusCode(500);
             }
         }
@@ -69,12 +71,37 @@ namespace NEFORmal.ua.Dating.Api.Controllers
 
         // Создание профиля
         [HttpPost]
-        public async Task<IActionResult> CreateProfile([FromForm] CreateProfileDto profileForCreate, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateProfile([FromForm] CreateProfileRequest createProfileRequest, CancellationToken cancellationToken)
         {
+            var sid = User.FindFirst(ClaimTypes.Sid)?.Value;
+
+            if (string.IsNullOrEmpty(sid))
+            {
+                return Unauthorized("Sid not found in the token.");
+            }
+
             try
             {
-                await _createProfileSagaService.ProcessProfileAsync(profileForCreate, cancellationToken);
-                return CreatedAtAction(nameof(GetProfileById), new { profileId = profileForCreate.Sid }, profileForCreate);
+                var profileForCreate = new CreateProfileDto(
+                    sid,
+                    createProfileRequest.Name,
+                    createProfileRequest.Sex,
+                    createProfileRequest.Bio,
+                    createProfileRequest.Age
+                );
+
+                var formFiles = createProfileRequest.ProfilePhotos.ToList();
+
+                var isOK = await _createProfileSagaService.ProcessProfileAsync(profileForCreate, formFiles, cancellationToken);
+
+                if (isOK)
+                {
+                    return CreatedAtAction(nameof(GetProfileById), new { profileId = profileForCreate.Sid }, profileForCreate);
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error.");
+                }
             }
             catch (Exception ex)
             {
@@ -85,12 +112,37 @@ namespace NEFORmal.ua.Dating.Api.Controllers
 
         // Обновление профиля
         [HttpPut("{profileId}")]
-        public async Task<IActionResult> UpdateProfile(int profileId, [FromForm] UpdateProfileDto profile, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateProfile(int profileId, [FromForm] UpdateProfileRequest updateProfileRequest, CancellationToken cancellationToken)
         {
+            var sid = User.FindFirst(ClaimTypes.Sid)?.Value;
+
+            if (string.IsNullOrEmpty(sid))
+            {
+                return Unauthorized("Sid not found in the token.");
+            }
+
             try
             {
-                await _updateProfileSagaService.UpdateProfileAsync(profileId, profile, cancellationToken);
-                return NoContent(); // Возвращаем успешный ответ без тела
+                var profileForUpdate = new UpdateProfileDto(
+                    sid,
+                    updateProfileRequest.Name,
+                    updateProfileRequest.Sex,
+                    updateProfileRequest.Bio,
+                    updateProfileRequest.Age
+                );
+
+                var formFiles = updateProfileRequest.ProfilePhotos.ToList();
+
+                var isOk = await _updateProfileSagaUseCase.UpdateProfileAsync(profileId, profileForUpdate, formFiles, cancellationToken);
+
+                if (isOk)
+                {
+                    return NoContent(); // Возвращаем успешный ответ без тела
+                }
+                else
+                {
+                    return StatusCode(500, "Internal server error.");
+                }
             }
             catch (Exception ex)
             {

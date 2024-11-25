@@ -22,7 +22,8 @@ public class FileServiceOptions
         }
     };
 
-    public string StoredFilesPath { get; init; } = string.Empty;
+    public string StoredFilesPath { get; init; } = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
     public long FileSizeLimit { get; init; }
     public string[] PermittedExtensions { get; init; } = [".webp", ".jpeg"];
+    public bool ValidateFileSignature { get; init; } = false;
 }

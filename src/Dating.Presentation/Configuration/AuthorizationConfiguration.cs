@@ -8,7 +8,7 @@ public static class AuthorizationConfiguration
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
 
-        var secretKey = Environment.GetEnvironmentVariable("SECRET");
+        var secretKey = Environment.GetEnvironmentVariable("SECRET") ?? "fhkdsjfsjdfj347823424dfhsfhdsf34288324234sdhfsf43242";
 
         ArgumentNullException.ThrowIfNullOrEmpty(secretKey);
         ArgumentNullException.ThrowIfNull(jwtSettings);
@@ -29,31 +29,6 @@ public static class AuthorizationConfiguration
                 ValidIssuer = jwtSettings["Issuer"],
                 ValidAudience = jwtSettings["Audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-            };
-            options.Events = new JwtBearerEvents
-            {
-                // Событие при неудачной аутентификации
-                OnAuthenticationFailed = context =>
-                {
-                    Console.WriteLine(context.Exception.Message);
-                    return Task.CompletedTask;
-                },
-                
-                // Событие при успешной валидации токена
-                OnTokenValidated = context =>
-                {
-                   Console.WriteLine(context.Principal.Identity.Name);
-          
-                    return Task.CompletedTask;
-                },
-
-                // Событие при отсутствии авторизации (например, токен не передан)
-                OnChallenge = context =>
-                {
-                    Console.WriteLine(context.ErrorDescription);
-              
-                    return Task.CompletedTask;
-                }
             };
         });
 

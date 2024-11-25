@@ -41,7 +41,6 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating profile: {ex.Message}");
                 return null;
             }
         }
@@ -116,7 +115,7 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
             try
             {
                 var existingProfile = await _profileRepo.GetProfileById(profileId, cancellationToken);
-                if (existingProfile == null)
+                if (existingProfile == null || existingProfile.Sid != profileForUpdate.sid)
                 {
                     return null;
                 }
@@ -135,7 +134,7 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating profile: {ex.Message}");
+                _logger.LogError($"Error updating profile: {ex.Message}");
                 return null;
             }
         }

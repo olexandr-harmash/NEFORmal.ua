@@ -5,7 +5,8 @@ namespace NEFORmal.ua.Dating.ApplicationCore.Models;
 
 public class Profile
 {
-    public List<string> LastFiles { get; private set; }
+    public IEnumerable<string> LastFiles { get; private set; }
+
     public int Id { get; private set; }
 
     private string _sid;
@@ -81,14 +82,15 @@ public class Profile
         }
     }
 
-    public Profile(string sid, string name, string bio, int age, string sex, List<string> fileNames)
+    public Profile(string sid, string name, string bio, int age, string sex, IEnumerable<string> profilePhotos)
     {
         Sid = sid;
         Name = name;
         Bio = bio;
         Age = age;
         Sex = sex;
-        ProfilePhotos = fileNames;
+        LastFiles = ProfilePhotos;
+        ProfilePhotos = profilePhotos;
     }
 
     public void UpdateAge(int newAge)
@@ -113,7 +115,7 @@ public class Profile
 
     public void UpdateProfilePhotos(IEnumerable<string> profilePhotos)
     {
-        LastFiles = ProfilePhotos.ToList();
+        LastFiles = ProfilePhotos;
         ProfilePhotos = profilePhotos;
     }
 
